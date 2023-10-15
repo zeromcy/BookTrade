@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <!-- 引入样式 -->
+  <link rel="stylesheet" href="../../plugins/element-ui/index.css" />
+  <link rel="stylesheet" href="../../styles/common.css" />
+  <link rel="stylesheet" href="../../styles/page.css" />
+  <style>
+    .search-btn {
+      margin-left: 20px;
+    }
+    .tableBar{
+      justify-content: flex-start !important;
+    }
+    .info-box{
+      margin: -15px -44px 20px;
+    }
+    .info-box .item-box{
+      display: flex;
+      height: 20px;
+      line-height: 20px;
+      font-size: 14px;
+      font-weight: 400;
+      color: #666666;
+      text-align: left;
+      margin-bottom: 14px;
+    }
+    .info-box .item-box:last-child{
+      margin-bottom: 0;
+    }
+    .info-box .item-box .label{
+      width: 96px;
+    }
+    .info-box .item-box .des{
+      flex: 1;
+      color: #333333;
+    }
+  </style>
+</head>
+<body>
+<div class="dashboard-container" id="order-app" v-loading="loading">
+  <div class="container">
+    <!-- 搜索项 -->
+    <div class="tableBar">
+      <el-input v-model="input" placeholder="请输入地址" style="width: 250px">
+        <i slot="prefix" class="el-input__icon el-icon-search" style="cursor: pointer" @click="init"></i>
+      </el-input>
+
+      <el-button type="primary" class="search-btn" @click="init()">查询</el-button>
+
+      <div class="tableLab">
+        <el-button
+                type="primary"
+                @click="handleAdd()"
+        >
+          新增地址
+        </el-button>
+
+
+      </div>
+    </div>
+
+    <el-table :data="tableData" stripe class="tableBox">
+
+      <el-table-column prop="address" label="地址名称">
+        <template slot-scope="{ row }">
+          {{row.address}}
+        </template>
+      </el-table-column>
+
+      <el-table-column prop="def" label="地址状态">
+        <template slot-scope="{ row }">
+                    <span>{{ row.def== 0?'默认':'待选中' }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="btn" label="操作">
+        <template slot-scope="{ row }">
+          <el-button type="text" @click="setDefault(row)" class="blueBug">
+            默认地址
+          </el-button>
+
+          <el-button type="text" @click="remove(row)" class="redBug">
+            删除地址
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination
+            class="pageList"
+            :page-sizes="[10, 20, 30, 40]"
+            :page-size="pageSize"
+            :current-page.sync="page"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="counts"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+    ></el-pagination>
+  </div>
+
+<!--  新增地址-->
+  <div class="reg-form">
+
+    <el-dialog title="新增地址界面" :visible.sync="dialogFormVisible">
+
+      <el-form ref="registerForm" :model="registerForm" :rules="rules" label-position="right" label-width="100px">
+
+        <el-row>
+
+          <el-col :span="20">
+            <el-form-item label="地址：" prop="address">
+              <el-input v-model="registerForm.address"/>
+            </el-form-item>
+          </el-col>
+
+
+          <el-col>
+            <el-form-item style="width:100%;">
+              <el-button :loading="loading" class="login-btn" size="medium" type="primary" style="width:100%;"
+                         @click="addAddress(registerForm)">
+                <span>保存</span>
+
+              </el-button>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+      </el-form>
+
+    </el-dialog>
+
+  </div>
+</div>
+<!-- 开发环境版本，包含了有帮助的命令行警告 -->
+<script src="../../plugins/vue/vue.js"></script>
+<!-- 引入组件库 -->
+<script src="../../plugins/element-ui/index.js"></script>
+<!-- 引入axios -->
+<script src="../../plugins/axios/axios.min.js"></script>
+<script src="../../js/request.js"></script>
+<script src="../../api/order.js"></script>
+<script>
+  new Vue({
+    el: '#order-app',
+    data() {
+      return {
+        input: '',
+        counts: 0,
+        page: 1,
+        pageSize: 10,
+        tableData : [],
+        registerForm:{
+          address:''
+        },
+        dialogVisible: false,
+        dialogFormVisible:false,
+        diaForm: {},
+        loading: false,
+        rules: {//校验规则
+          address: [{ required: true, message: '地址为必填项', trigger: 'blur' }],
+          // password: [{ required: true, message: '密码为必填项', trigger: 'blur' }]
+        }
+      }
+    },
+    computed: {},
+
+    created() {
+      this.init()
+    },
+    mounted() {
+
+    },
+    methods: {
+      async init () {
+        getOrderpDetailPage({ page: this.page, pageSize: this.pageSize, number: this.input || undefined}).then(res => {
+          if (String(res.code) === '1') {
+            this.tableData = res.data.records || []
+            this.counts = res.data.total
+          }
+        }).catch(err => {
+          this.$message.error('请求出错了：' + err)
+        })
+      },
+      getImage (image) {
+        return `/common/download?name=${image}`
+      },
+      handleQuery() {
+        this.page = 1;
+        this.init();
+      },
+      getOrderType (row) {
+        let str = ''
+        switch(row.status){
+          case 1:
+            str =  '已支付'
+            break;
+          case 2:
+            str =  '正在派送'
+            break;
+          case 3:
+            str =  '已派送'
+            break;
+          case 4:
+            str =  '已完成'
+            break;
+          case 5:
+            str =  '已取消'
+            break;
+
+        }
+        return str
+      },
+      // 查看详情
+      setDefault(row) {
+          this.$confirm('确认设置此地址为默认地址?', '提示', {
+              'confirmButtonText': '确定',
+              'cancelButtonText': '取消',
+              'type': 'warning'
+          }).then(() => {
+              setDefaultApi(row).then(res => {
+                  if (res.code === 1) {
+                      this.$message.success('订单已完成支付')
+                      this.init()
+                  } else {
+                      this.$message.error(res.msg || '操作失败')
+                  }
+              }).catch(err => {
+                  this.$message.error('请求出错了：' + err)
+              })
+          })
+
+      },
+      // 取消，派送，完成
+      cancelOrDeliveryOrComplete (row) {
+        this.$confirm('确认支付订单?', '提示', {
+          'confirmButtonText': '确定',
+          'cancelButtonText': '取消',
+          'type': 'warning'
+        }).then(() => {
+          editOrderDetail(params).then(res => {
+            if (res.code === 1) {
+              this.$message.success('订单已完成支付')
+              this.init()
+            } else {
+              this.$message.error(res.msg || '操作失败')
+            }
+          }).catch(err => {
+            this.$message.error('请求出错了：' + err)
+          })
+        })
+        const params = {
+          status,
+          id
+        }
+      },
+      handleClose () {
+        this.dialogVisible = false
+      },
+      handleSizeChange (val) {
+        this.pageSize = val
+        this.init()
+      },
+      handleCurrentChange (val) {
+        this.page = val
+        this.init()
+      },
+      handleAdd(){
+        this.dialogFormVisible = true
+      },
+      //新增地址
+      addAddress(row){
+        addAddressApi(row).then(res => {
+          if(res.code ===1){
+            this.$message.success('新增地址成功')
+            this.dialogFormVisible = false
+            this.init()
+          }else {
+            this.$message.error(res.msg || '操作失败');
+          }
+        }).catch(err =>{
+          this.$message.error('请求出错了：'+err)
+        })
+      },
+
+      remove(row){
+        this.$confirm('确定删除地址?', '提示', {
+          'confirmButtonText': '确定',
+          'cancelButtonText': '取消',
+          'type': 'warning'
+        }).then(() => {
+                  removeApi(row).then(res =>{
+                    if(res.code ===1){
+                      this.$message.success('删除地址成功')
+                      this.dialogFormVisible = false
+                      this.init()
+                    }else {
+                      this.$message.error(res.msg || '操作失败');
+                    }
+                  }).catch(err =>{
+                    this.$message.error('请求出错了：'+err)
+                  })
+                }
+               )
+      }
+    }
+  })
+</script>
+</body>
+</html>
