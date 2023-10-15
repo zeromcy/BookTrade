@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
-public class LoginController {
+public class UserController {
 
     @Autowired
     private UserService userService;
@@ -17,5 +17,11 @@ public class LoginController {
 
 
         return userService.login();
+    }
+
+    @PostMapping("/register")
+    public String register(@RequestBody User user){
+        userService.register(user);
+        return null;
     }
 }

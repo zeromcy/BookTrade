@@ -6,4 +6,9 @@
    <select id="getUserByUsername" resultType="com.zjf.pojo.User">
        select * from user
    </select>
+
+    <insert id="insert">
+        insert into `user` (username,password)
+        values (#{username},#{password})
+    </insert>
 </mapper>

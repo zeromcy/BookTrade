@@ -15,4 +15,10 @@ public class UserServiceImpl implements UserService {
     public User login() {
         return userMapper.getUserByUsername();
     }
+
+    @Override
+    public String register(User user) {
+        userMapper.insert(user);
+        return null;
+    }
 }
