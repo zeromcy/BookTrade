@@ -1,0 +1,74 @@
+#address .divHead {
+
+
+}
+
+#address .divHead .divTitle {
+
+
+}
+
+#address .divHead .divTitle i {
+
+}
+
+#address .divContent {
+
+}
+
+#address .divContent .divItem {
+
+}
+
+#address .divContent .divItem > img {
+
+}
+
+#address .divContent .divItem .divDefault img {
+
+}
+
+#address .divContent .divItem .divAddress {
+
+}
+
+#address .divContent .divItem .divAddress span {
+
+}
+
+#address .divContent .divItem .divUserPhone span {
+
+}
+
+#address .divContent .divItem .divUserPhone span:first-child {
+  margin-right: 2rem;
+}
+
+#address .divContent .divItem .divAddress .spanCompany {
+  background-color: #e1f1fe;
+}
+
+#address .divContent .divItem .divAddress .spanHome {
+  background: #fef8e7;
+}
+
+#address .divContent .divItem .divAddress .spanSchool {
+  background: #e7fef8;
+}
+
+#address .divContent .divItem .divSplit {
+
+}
+
+#address .divContent .divItem .divDefault {
+
+}
+
+#address .divContent .divItem .divDefault img {
+
+}
+
+#address .divBottom {
+
+
+}

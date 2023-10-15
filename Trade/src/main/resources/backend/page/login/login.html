@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>智农系统商家端</title>
+  <link rel="shortcut icon" href="../../favicon.ico">
+  <!-- 引入样式 -->
+  <link rel="stylesheet" href="../../plugins/element-ui/index.css" />
+  <link rel="stylesheet" href="../../styles/common.css">
+  <link rel="stylesheet" href="../../styles/login.css">
+  <link rel="stylesheet" href="../../styles/icon/iconfont.css" />
+  <style>
+    .body{
+      min-width: 1366px;
+    }
+    .reg-form{
+
+    }
+  </style>
+</head> 
+
+<body>
+  <div class="login" id="login-app">
+    <div class="login-box">
+      <img src="../../images/login/login-l.png" alt="">
+      <div class="login-form">
+        <el-form ref="loginForm" :model="loginForm" :rules="loginRules" >
+          <div class="login-form-title">
+            <img src="../../images/login/logo.png" style="width:139px;height:42px;" alt="" />
+          </div>
+          <el-form-item prop="username">
+            <el-input v-model="loginForm.username" type="text" auto-complete="off" placeholder="账号" maxlength="20"
+              prefix-icon="iconfont icon-user" />
+          </el-form-item>
+          <el-form-item prop="password">
+            <el-input v-model="loginForm.password" type="password" placeholder="密码" show-password prefix-icon="iconfont icon-lock" maxlength="20"
+              @keyup.enter.native="handleLogin" />
+          </el-form-item>
+          <el-form-item prop="status">
+            <template>
+              <el-radio v-model="loginForm.status" label="0">商家</el-radio>
+              <el-radio v-model="loginForm.status" label="1">用户</el-radio>
+            </template>
+          </el-form-item>
+
+          <el-form-item style="width:100%;">
+            <el-button :loading="loading" class="login-btn" size="medium" type="primary" style="width:100%;"
+              @click.native.prevent="handleLogin">
+              <span v-if="!loading">登录</span>
+              <span v-else>登录中...</span>
+            </el-button>
+            <el-button  size="medium" plain style="width:90%;" @click="handleRegister()">
+              <span>注册</span>
+            </el-button>
+            <el-button  size="mini"  style="width:90%;" @click="handleReset()">
+              <el-link type="info">忘记密码</el-link>
+            </el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+    </div>
+
+<!--    注册表单-->
+    <div class="reg-form">
+
+      <el-dialog title="注册界面" :visible.sync="dialogFormVisible">
+
+        <el-form ref="registerForm" :model="registerForm" :rules="rules" label-position="right" label-width="100px">
+
+          <el-row>
+
+            <el-col :span="20">
+              <el-form-item label="用户名" prop="username">
+                <el-input v-model="registerForm.username"/>
+              </el-form-item>
+            </el-col>
+
+            <el-col :span="20">
+              <el-form-item label="密码" prop="password">
+                <el-input v-model="registerForm.password"/>
+              </el-form-item>
+            </el-col>
+
+            <el-col >
+              <el-form-item prop="status">
+                <template>
+                  <el-radio v-model="registerForm.status" label="0">商家</el-radio>
+                  <el-radio v-model="registerForm.status" label="1">用户</el-radio>
+                </template>
+              </el-form-item>
+            </el-col>
+
+            <el-col>
+              <el-form-item style="width:100%;">
+                <el-button :loading="loading" class="login-btn" size="medium" type="primary" style="width:100%;"
+                           @click="register(registerForm)">
+                  <span>注册</span>
+
+                </el-button>
+              </el-form-item>
+            </el-col>
+          </el-row>
+
+        </el-form>
+
+      </el-dialog>
+
+    </div>
+    <!--    重置密码表单-->
+    <div class="set-form">
+
+      <el-dialog title="重置密码界面" :visible.sync="resetFormVisible">
+
+        <el-form ref="reForm" :model="reForm" :rules="setRules" label-position="right" label-width="100px">
+
+          <el-row>
+
+            <el-col :span="20">
+              <el-form-item label="密码" prop="password">
+                <el-input v-model="reForm.password" show-password/>
+              </el-form-item>
+            </el-col>
+
+            <el-col :span="20">
+              <el-form-item label="确认密码" prop="rePassword" >
+                <el-input v-model="reForm.rePassword" show-password/>
+              </el-form-item>
+            </el-col>
+
+            <el-col :span="20">
+              <el-form-item label="手机号" prop="phone">
+                <el-input v-model="reForm.phone"/>
+              </el-form-item>
+            </el-col>
+
+            <el-col>
+              <el-form-item style="width:100%;">
+                <el-button :loading="loading" class="login-btn" size="medium" type="primary" style="width:100%;"
+                           @click="reset(reForm)">
+                  <span>确定</span>
+
+                </el-button>
+              </el-form-item>
+            </el-col>
+          </el-row>
+
+        </el-form>
+
+      </el-dialog>
+
+    </div>
+  </div>
+
+
+
+
+  <!-- 开发环境版本，包含了有帮助的命令行警告 -->
+  <script src="../../plugins/vue/vue.js"></script>
+  <!-- 引入组件库 -->
+  <script src="../../plugins/element-ui/index.js"></script>
+  <!-- 引入axios -->
+  <script src="../../plugins/axios/axios.min.js"></script>
+  <script src="../../js/request.js"></script>
+  <script src="../../js/validate.js"></script>
+  <script src="../../api/login.js"></script>
+
+  <script>
+    new Vue({
+      el: '#login-app',
+      data:{
+        dialogFormVisible: false,//控制表单是否可见
+        dialogFormVisibleEdit:false,//编辑表单是否可见
+        resetFormVisible:false,
+        loginForm:{
+          username: '',
+          password: '',
+          status:'0'
+        },
+        loading: false,
+        registerForm: {
+          username:'',
+          password:'',
+          status: '1'
+        },
+        reForm: {
+          password:'',
+          rePassword:'',
+          phone: ''
+        },
+        rules: {//校验规则
+          username: [{ required: true, message: '用户名为必填项', trigger: 'blur' }],
+          password: [{ required: true, message: '密码为必填项', trigger: 'blur' }]
+        },
+        // setRules: {//校验规则
+        //   rePassword: [{ required: true, message: '密码为必填项', trigger: 'blur' }],
+        //   password: [{ required: true, message: '确认密码为必填项', trigger: 'blur' }],
+        //   phone: [{ required: true, message: '手机号为必填项', trigger: 'blur' }]
+        // }
+      },
+
+      computed: {
+        loginRules() {
+          const validateUsername = (rule, value, callback) => {
+            if (value.length < 1 ) {
+              callback(new Error('请输入用户名'))
+            } else {
+              callback()
+            }
+          }
+          const validatePassword = (rule, value, callback) => {
+            if (value.length < 6) {
+              callback(new Error('密码必须在6位以上'))
+            } else {
+              callback()
+            }
+          }
+          return {
+            'username': [{ 'validator': validateUsername, 'trigger': 'blur' }],
+            'password': [{ 'validator': validatePassword, 'trigger': 'blur' }]
+          }
+        },
+        setRules() {
+          const password = this.reForm.password
+          const rePassword = this.reForm.rePassword
+          const validatePassword = (rule, value, callback) => {
+            if (value.length < 6 ) {
+              callback(new Error('密码必须在6位以上'))
+            } else {
+              callback()
+            }
+          }
+          const validateRePassword = (rule, value, callback) => {
+            if (value.length < 6) {
+              callback(new Error('密码必须在6位以上'))
+            }else if(password !== rePassword){
+              callback(new Error('两次密码必须一致'))
+            }
+            else {
+              callback()
+            }
+          }
+          return {
+            'password': [{ 'validator': validatePassword, 'trigger': 'blur' }],
+            'rePassword': [{ 'validator': validateRePassword, 'trigger': 'blur' }]
+          }
+        }
+      },
+      created() {
+      },
+      methods: {
+        async handleLogin() {
+          this.$refs.loginForm.validate(async (valid) => {
+            if (valid) {
+              this.loading = true
+              let res = await loginApi(this.loginForm)
+              if (String(res.code) === '1'&& res.data.status === 0) {
+
+                localStorage.setItem('userInfo', JSON.stringify(res.data))
+                window.location.href = '/backend/index.html'
+              }
+              else if (String(res.code) === '1' && res.data.status === 1) {
+
+                localStorage.setItem('userInfo', JSON.stringify(res.data))
+                window.location.href = '/backend/userIndex.html'
+              }
+              else {
+                this.$message.error(res.msg)
+                this.loading = false
+              }
+            }
+          })
+        },
+
+        //弹出注册框
+        handleRegister(){
+          this.dialogFormVisible = true;
+        },
+        handleReset(){
+          this.resetFormVisible = true
+        },
+
+        //注册功能
+         async register(registerForm) {
+           let res = await registerApi(this.registerForm)
+           // console.log(res)
+           if(String(res.code) === '1'){
+             this.$message.success(res.msg)
+             this.dialogFormVisible = false
+             this.registerForm = {status:'0'}
+           }
+           else {
+             this.$message.error(res.msg)
+           }
+         },
+        //重置密码
+        async reset(reForm) {
+
+          let res = await resetApi(this.reForm)
+          // console.log(res)
+          if (String(res.code) === '1') {
+            this.$message.success(res.msg)
+            this.reForm = {
+              password:'',
+              rePassword:'',
+              phone: ''
+            }
+            this.resetFormVisible = false
+          } else {
+            this.$message.error(res.msg)
+          }
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>
