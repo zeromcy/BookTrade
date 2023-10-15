@@ -23,11 +23,10 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
-<<<<<<< HEAD
 
 
-=======
->>>>>>> f71168974c86ea238d6d95e8a00651ca5e1e712b
+
+
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
@@ -61,7 +60,6 @@ build/
 
 ### VS Code ###
 .vscode/
-<<<<<<< HEAD
 
-=======
->>>>>>> f71168974c86ea238d6d95e8a00651ca5e1e712b
+
+
