@@ -1,11 +1,16 @@
 package com.zjf.mapper;
 
+import com.zjf.common.R;
 import com.zjf.pojo.User;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Map;
+
 @Mapper
 public interface UserMapper {
-    User getUserByUsername();
+    User getUserByUsername(Map map);
 
-    String insert(User user);
+    int insert(User user);
+
+    User queryUserByName(Map map);
 }

@@ -1,11 +1,12 @@
 package com.zjf.service;
 
+import com.zjf.common.R;
 import com.zjf.pojo.User;
 import org.springframework.stereotype.Service;
 
 
 public interface UserService {
-     User login();
+    R<User> login(User user);
 
-    String register(User user);
+    R<String> register(User user);
 }

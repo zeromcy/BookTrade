@@ -12,4 +12,5 @@ public class User {
     private Integer age;
     private String id_card;
     private String address;
+    private Integer status;
 }

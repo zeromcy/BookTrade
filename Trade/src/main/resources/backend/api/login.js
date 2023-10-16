@@ -1,6 +1,6 @@
 function loginApi(data) {
   return $axios({
-    'url': '/employee/login',
+    'url': '/user/login',
     'method': 'post',
     data
   })
@@ -8,7 +8,7 @@ function loginApi(data) {
 
 function logoutApi(){
   return $axios({
-    'url': '/employee/logout',
+    'url': '/user/logout',
     'method': 'post',
   })
 }
@@ -16,7 +16,7 @@ function logoutApi(){
 
 function registerApi(data){
   return $axios({
-    'url': '/employee/register',
+    'url': '/user/register',
     'method': 'post',
     data
   })
